@@ -1,0 +1,135 @@
+{
+  "project_info": {
+    "project_number": "837852694060",
+    "firebase_url": "https://ticket-app-1b993.firebaseio.com",
+    "project_id": "ticket-app-1b993",
+    "storage_bucket": "ticket-app-1b993.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:837852694060:android:3d417e7359e8ddb4",
+        "android_client_info": {
+          "package_name": "com.ada.android.ticketsappcliente"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "837852694060-7sadmh5f6vnfja436n3difi01qoboi0e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlO4wChiTSxmfOOeAaTWVuXmRS4-Y-Q5c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:837852694060:android:9329fe858aeae974",
+        "android_client_info": {
+          "package_name": "com.ada.android.ticketsappsoporte"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "837852694060-7sadmh5f6vnfja436n3difi01qoboi0e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlO4wChiTSxmfOOeAaTWVuXmRS4-Y-Q5c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:837852694060:android:58ed3569c856f0ea",
+        "android_client_info": {
+          "package_name": "org.taitascioredev.android.pruebachat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "837852694060-7sadmh5f6vnfja436n3difi01qoboi0e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlO4wChiTSxmfOOeAaTWVuXmRS4-Y-Q5c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:837852694060:android:97066238dfb0de0e",
+        "android_client_info": {
+          "package_name": "org.taitascioredev.android.adachat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "837852694060-7sadmh5f6vnfja436n3difi01qoboi0e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlO4wChiTSxmfOOeAaTWVuXmRS4-Y-Q5c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
