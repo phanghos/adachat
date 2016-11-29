@@ -15,10 +15,10 @@
 
         <activity android:name=".ChatActivity" />
 
-        <service android:name=".FirebaseClientService"
+        <service android:name="org.taitascioredev.android.services.FirebaseService"
             android:exported="false" />
 
-        <service android:name=".FirebaseSupportService"
+        <service android:name="org.taitascioredev.android.services.FirebaseSupportService"
             android:exported="false" />
 
     </application>

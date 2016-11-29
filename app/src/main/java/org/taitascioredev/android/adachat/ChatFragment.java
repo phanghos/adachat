@@ -24,6 +24,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
+import org.taitascioredev.android.services.FirebaseService;
+import org.taitascioredev.android.util.ChatUtils;
+import org.taitascioredev.android.util.Utils;
+
 import java.util.Date;
 
 /**
@@ -60,7 +64,7 @@ public class ChatFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         App.isChatOpen = true;
-        FirebaseClientService.nMsg = 0;
+        FirebaseService.nMsg = 0;
 
         etMsj = (EditText) getActivity().findViewById(R.id.et_mensaje);
         btnEnviar = (ImageView) getActivity().findViewById(R.id.iv_enviar);
@@ -76,7 +80,7 @@ public class ChatFragment extends Fragment {
             sender   = extras.getInt("id");
             receiver = extras.getInt("receiver");
             conf     = (ChatConfiguration) extras.getSerializable("conf");
-            cancelNotification(FirebaseClientService.CHAT_MESSAGE_NOTIFICATION_ID);
+            cancelNotification(FirebaseService.CHAT_MESSAGE_NOTIFICATION_ID);
         }
 
         addEventListener();
@@ -87,12 +91,7 @@ public class ChatFragment extends Fragment {
                 String msg = etMsj.getText().toString();
 
                 if (!msg.isEmpty()) {
-                    Mensaje m = fillMessageInfo();
-
-                    DatabaseReference ref = database.getReference("mensajes2").child(sender +"").child(receiver+"");
-                    DatabaseReference pushRef = ref.child("mensajes2").push();
-                    String key = pushRef.getKey();
-                    m.setKey(key);
+                    ChatUtils.sendMessage(sender, receiver, etMsj.getText().toString().trim());
 
                     /*
                     if (ticket != null) {
@@ -103,14 +102,6 @@ public class ChatFragment extends Fragment {
                         ref.child("producto").setValue(ticket.getNombre_producto());
                     }
                     */
-
-                    pushRef.setValue(m);
-
-                    ref = database.getReference("mensajes2").child(receiver+"").child(sender+"");
-                    pushRef = ref.child("mensajes2").push();
-                    key = pushRef.getKey();
-                    m.setKey(key);
-                    pushRef.setValue(m);
 
                     Utils.hideKeyboard(getActivity());
                     etMsj.setText("");
@@ -127,7 +118,7 @@ public class ChatFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        FirebaseClientService.nMsg = 0;
+        FirebaseService.nMsg = 0;
         App.isChatOpen = false;
     }
 

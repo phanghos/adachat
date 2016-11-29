@@ -1,4 +1,4 @@
-package org.taitascioredev.android.adachat;
+package org.taitascioredev.android.util;
 
 import android.app.Activity;
 import android.content.Context;

@@ -101,16 +101,29 @@ public class ChatActivity extends AppCompatActivity {
             return this;
         }
 
-        public Builder setTextColor(int color) {
-            conf.setTextColor(color);
-            return this;
-        }
-
         public Builder setTextSize(int size) {
             conf.setTextSize(size);
             return this;
         }
 
+        public Builder setTextColor(int color) {
+            conf.setTextColor(color);
+            return this;
+        }
 
+        public Builder setProgressWheelColor(int color) {
+            conf.setProgressWheelColor(color);
+            return this;
+        }
+
+        public Builder setEditTextLineColor(int color) {
+            conf.setEditTextLineColor(color);
+            return this;
+        }
+
+        public Builder setEditTextHint(String hint) {
+            conf.setEditTextHint(hint);
+            return this;
+        }
     }
 }

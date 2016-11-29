@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.taitascioredev.android.util.Utils;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -85,8 +87,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                     context, R.drawable.background_msg_primary);
             d.setColor(ContextCompat.getColor(context, conf.getSenderBgColor()));
             vh.mensaje.setBackground(d);
-
-            //vh.mensaje.setBackground(ContextCompat.getDrawable(context, R.drawable.background_msg_primary));
         }
         else {
             params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 1);
@@ -99,8 +99,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                     context, R.drawable.background_msg_accent);
             d.setColor(ContextCompat.getColor(context, conf.getReceiverBgColor()));
             vh.mensaje.setBackground(d);
-
-            //vh.mensaje.setBackground(ContextCompat.getDrawable(context, R.drawable.background_msg_accent));
         }
 
         vh.mensaje.setTextColor(ContextCompat.getColor(context, conf.getTextColor()));

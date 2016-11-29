@@ -1,4 +1,4 @@
-package org.taitascioredev.android.adachat;
+package org.taitascioredev.android.services;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -18,18 +18,29 @@ import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.taitascioredev.android.adachat.App;
+import org.taitascioredev.android.adachat.ChatActivity;
+import org.taitascioredev.android.adachat.Conversacion;
+import org.taitascioredev.android.adachat.Mensaje;
+import org.taitascioredev.android.adachat.R;
+import org.taitascioredev.android.util.Utils;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /**
- * Created by roberto on 22/08/16.
+ * Created by roberto on 21/08/16.
  */
-public class FirebaseSupportService extends Service {
+public class FirebaseService extends Service {
 
-    public static boolean isRunning;
+    public static boolean isRunning = false;
     public static int nMsg = 0;
-    public static int mNotifId = 001;
     public static int CHAT_MESSAGE_NOTIFICATION_ID  = 007;
+    public static List<Mensaje> list;
+
+    int user;
 
     FirebaseDatabase database;
 
@@ -47,7 +58,8 @@ public class FirebaseSupportService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("onStarCommand", "STARTED SUPPORT SERVICE");
+        list = new ArrayList<Mensaje>();
+        user = Utils.getLoggedUserId(this);
         database = FirebaseDatabase.getInstance();
 
         if (!isRunning) {
@@ -59,63 +71,55 @@ public class FirebaseSupportService extends Service {
     }
 
     private void addEventListenerForChat() {
-        DatabaseReference ref = database.getReference("mensajes2");
+        DatabaseReference ref = database.getReference("mensajes2").child(user+"");
 
         ref.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.d("onChildAdded", dataSnapshot.getValue().toString()+"");
 
-                if (dataSnapshot != null) {
-                    for (DataSnapshot child : dataSnapshot.getChildren()) {
-                        try {
-                            Conversacion c = child.getValue(Conversacion.class);
-                            if (c.getMensajes() == null) return;
-                            HashMap<String, Mensaje> mensajes = c.getMensajes();
+                try {
+                    Conversacion c = dataSnapshot.getValue(Conversacion.class);
+                    if (c.getMensajes() == null) return;
+                    HashMap<String, Mensaje> mensajes = c.getMensajes();
 
-                            for (String key : mensajes.keySet()) {
-                                Mensaje mensaje = mensajes.get(key);
-                                if (mensaje != null && mensaje.getIdReceiver() == 0 && !mensaje.isVisto()
-                                    && !App.isChatOpen)
-                                    showNotificationForMessage(mensaje, c.getId_ticket());
-                            }
-                        } catch (DatabaseException e) {
-
-                        } catch (ClassCastException e) {
-
-                        }
+                    for (String key : mensajes.keySet()) {
+                        Mensaje mensaje = mensajes.get(key);
+                        if (mensaje != null && mensaje.getIdReceiver() > 0 && !mensaje.isVisto()
+                                && !App.isChatOpen)
+                            showNotificationForMessage(mensaje, c.getId_ticket());
                     }
+                } catch (DatabaseException e) {
+
+                } catch (ClassCastException e) {
+
                 }
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Log.d("onChildChanged", dataSnapshot.getValue().toString());
+                Log.d("onChildChanged", dataSnapshot.getValue().toString()+"");
 
-                if (dataSnapshot != null) {
-                    for (DataSnapshot child : dataSnapshot.getChildren()) {
-                        try {
-                            Conversacion c = child.getValue(Conversacion.class);
-                            if (c.getMensajes() == null) return;
-                            HashMap<String, Mensaje> mensajes = c.getMensajes();
-                            Object[] keys = mensajes.keySet().toArray();
-                            Mensaje[] list = new Mensaje[keys.length];
-                            for (int i = 0; i < keys.length; i++) list[i] = mensajes.get(keys[i]+"");
-                            Arrays.sort(list);
+                try {
+                    Conversacion c = dataSnapshot.getValue(Conversacion.class);
+                    if (c.getMensajes() == null) return;
+                    HashMap<String, Mensaje> mensajes = c.getMensajes();
+                    Object[] keys = mensajes.keySet().toArray();
+                    Mensaje[] list = new Mensaje[keys.length];
+                    for (int i = 0; i < keys.length; i++) list[i] = mensajes.get(keys[i]+"");
+                    Arrays.sort(list);
 
-                            Mensaje mensaje = list[list.length - 1];
-                            Log.d("Ultimo mensaje", mensaje.getMensaje());
-                            if (mensaje != null && mensaje.getIdReceiver() == 0 && !mensaje.isVisto()
-                                    && !App.isChatOpen) {
-                                Log.d("Debug", "Se mostrata notificacion de mensaje");
-                                showNotificationForMessage(mensaje, c.getId_ticket());
-                            }
-                        } catch (DatabaseException e) {
-
-                        } catch (ClassCastException e) {
-
-                        }
+                    Mensaje mensaje = list[list.length - 1];
+                    Log.d("Ultimo mensaje", mensaje.getMensaje());
+                    if (mensaje != null && mensaje.getIdReceiver() > 0 && !mensaje.isVisto()
+                            && !App.isChatOpen) {
+                        Log.d("Debug", "Se mostrata notificacion de mensaje");
+                        showNotificationForMessage(mensaje, c.getId_ticket());
                     }
+                } catch (DatabaseException e) {
+
+                } catch (ClassCastException e) {
+
                 }
             }
 
@@ -148,15 +152,15 @@ public class FirebaseSupportService extends Service {
         Bundle b = new Bundle();
         b.putInt("id", idTicket);
         b.putInt("receiver", m.getIdSender());
-        b.putInt("notif_id", mNotifId);
+        b.putInt("notif_id", idTicket);
         resultIntent.putExtras(b);
-        //resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         // Because clicking the notification opens a new ("special") activity, there's
         // no need to create an artificial back stack.
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
                         this,
-                        mNotifId,
+                        idTicket,
                         resultIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
