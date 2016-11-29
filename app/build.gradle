@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 group='com.github.phanghos'
 
@@ -6,7 +6,6 @@ android {
     compileSdkVersion 24
     buildToolsVersion "24.0.1"
     defaultConfig {
-        applicationId "org.taitascioredev.android.adachat"
         minSdkVersion 17
         targetSdkVersion 24
         versionCode 1
