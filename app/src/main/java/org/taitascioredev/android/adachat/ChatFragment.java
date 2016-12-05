@@ -2,9 +2,11 @@ package org.taitascioredev.android.adachat;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -31,7 +33,7 @@ import org.taitascioredev.android.util.Utils;
 import java.util.Date;
 
 /**
- * Created by roberto on 23/08/16.
+ * Created by roberto on 28/11/16.
  */
 public class ChatFragment extends Fragment {
 
@@ -40,6 +42,9 @@ public class ChatFragment extends Fragment {
 
     FirebaseDatabase database;
     DatabaseReference ref;
+    ChildEventListener mChildListener;
+
+    ChatActivity context;
 
     RecyclerView mRecyclerView;
     ChatAdapter mAdapter;
@@ -65,6 +70,7 @@ public class ChatFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         App.isChatOpen = true;
         FirebaseService.nMsg = 0;
+        context = App.context;
 
         etMsj = (EditText) getActivity().findViewById(R.id.et_mensaje);
         btnEnviar = (ImageView) getActivity().findViewById(R.id.iv_enviar);
@@ -79,9 +85,19 @@ public class ChatFragment extends Fragment {
         if (extras != null) {
             sender   = extras.getInt("id");
             receiver = extras.getInt("receiver");
-            conf     = (ChatConfiguration) extras.getSerializable("conf");
+            conf     = (ChatConfiguration) extras.getSerializable("mConf");
             cancelNotification(FirebaseService.CHAT_MESSAGE_NOTIFICATION_ID);
         }
+
+        int wheelColor = conf.getProgressWheelColor();
+        wheel.setBarColor(ContextCompat.getColor(context, wheelColor));
+
+        int editTextLineColor = conf.getEditTextLineColor();
+        etMsj.getBackground().setColorFilter(
+                ContextCompat.getColor(context, editTextLineColor), PorterDuff.Mode.SRC_ATOP);
+
+        String editTextHint = conf.getEditTextHint();
+        etMsj.setHint(editTextHint);
 
         addEventListener();
 
@@ -116,10 +132,21 @@ public class ChatFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onStop() {
+        super.onStop();
+        Log.d("Debug", "onStop");
         FirebaseService.nMsg = 0;
         App.isChatOpen = false;
+        ref.removeEventListener(mChildListener);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("Debug", "onDestroy");
+        FirebaseService.nMsg = 0;
+        App.isChatOpen = false;
+        ref.removeEventListener(mChildListener);
     }
 
     private void cancelNotification(int id) {
@@ -129,13 +156,21 @@ public class ChatFragment extends Fragment {
 
     private void addEventListener() {
         database = FirebaseDatabase.getInstance();
-        ref = database.getReference("mensajes2").child(sender+"").child(receiver+"").child("mensajes2");
+        ref = database.getReference("mensajes2");
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 wheel.setVisibility(View.GONE);
-                if (dataSnapshot.getChildrenCount() == 0) {
+
+                int count = 0;
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    Mensaje m = child.getValue(Mensaje.class);
+                    if (m.getIdSender() == sender && m.getIdReceiver() == receiver
+                            || m.getIdSender() == receiver && m.getIdReceiver() == sender) count++;
+                }
+
+                if (count == 0) {
                     empty.setText("Aún no has enviado un mensaje");
                     empty.setVisibility(View.VISIBLE);
                 }
@@ -147,26 +182,24 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        ref.addChildEventListener(new ChildEventListener() {
+        mChildListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.d("onChildAdded", dataSnapshot.getValue().toString());
-                try {
-                    Mensaje m = dataSnapshot.getValue(Mensaje.class);
-                    Log.d("MENSAJE", m.getMensaje());
-                    if (m.getIdReceiver() > 0 && !m.isVisto()) {
+
+                Mensaje m = dataSnapshot.getValue(Mensaje.class);
+                if (m.getIdSender() == sender && m.getIdReceiver() == receiver
+                        || m.getIdSender() == receiver && m.getIdReceiver() == sender) {
+                    context.getOnMessageReceivedListener().onMessageReceived(m);
+                    if (m.getIdReceiver() == sender && !m.isVisto() && App.isChatOpen) {
                         m.setVisto(true);
                         ref.child(m.getKey()).child("visto").setValue(true);
                     }
+
                     mAdapter.add(m);
                     mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
-                } catch (DatabaseException e) {
-
-                } catch (ClassCastException e) {
-
+                    empty.setVisibility(View.GONE);
                 }
-
-                empty.setVisibility(View.GONE);
             }
 
             @Override
@@ -188,18 +221,8 @@ public class ChatFragment extends Fragment {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
-    }
+        };
 
-    private Mensaje fillMessageInfo() {
-        Mensaje m = new Mensaje();
-        //int idCliente = Utils.getLoggedUserId(getActivity());
-        m.setIdSender(sender);
-        m.setIdReceiver(receiver);
-        m.setVisto(false);
-        m.setMensaje(etMsj.getText().toString());
-        m.setTime(new Date());
-
-        return m;
+        ref.addChildEventListener(mChildListener);
     }
 }

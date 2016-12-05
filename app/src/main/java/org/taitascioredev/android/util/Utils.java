@@ -49,8 +49,4 @@ public final class Utils {
         Date now = new Date();
         return now.getDate() == date.getDate() && now.getMonth() == date.getMonth() && now.getYear() == date.getYear();
     }
-
-    public static int getLoggedUserType(Context context) {
-        return 1;
-    }
 }

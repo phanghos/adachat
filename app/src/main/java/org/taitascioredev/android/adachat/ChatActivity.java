@@ -9,6 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import org.taitascioredev.android.listeners.OnMessageReceiveListener;
+import org.taitascioredev.android.util.ChatUtils;
+import org.taitascioredev.android.util.Utils;
+
 /**
  * Created by roberto on 28/11/16.
  */
@@ -17,7 +21,14 @@ public class ChatActivity extends AppCompatActivity {
     int id;
     int receiver;
 
-    protected ChatConfiguration conf;
+    protected ChatConfiguration mConf;
+
+    private OnMessageReceiveListener mOnMessageReceiveListener = new OnMessageReceiveListener() {
+        @Override
+        public void onMessageReceived(Mensaje mensaje) {
+
+        }
+    };
 
     Toolbar toolbar;
 
@@ -25,6 +36,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        App.context = this;
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setToolbar();
@@ -33,6 +45,11 @@ public class ChatActivity extends AppCompatActivity {
         if (extras != null) {
             id = extras.getInt("id");
             receiver = extras.getInt("receiver");
+            String title = extras.getString("title", "");
+            if (title == null) title = "";
+            setTitle(title);
+            Utils.saveLoggedUserId(this, id);
+            ChatUtils.startService(this, id);
         }
 
         if (savedInstanceState == null) {
@@ -40,11 +57,11 @@ public class ChatActivity extends AppCompatActivity {
             if (getConfiguration() == null) setConfiguration(new ChatConfiguration(this));
 
             if (extras != null) {
-                extras.putSerializable("conf", getConfiguration());
+                extras.putSerializable("mConf", getConfiguration());
                 f.setArguments(extras);
             } else {
                 extras = new Bundle();
-                extras.putSerializable("conf", getConfiguration());
+                extras.putSerializable("mConf", getConfiguration());
                 f.setArguments(extras);
             }
 
@@ -55,8 +72,10 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home)
+        if (item.getItemId() == android.R.id.home) {
             super.onBackPressed();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -68,14 +87,22 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     protected void setConfiguration(ChatConfiguration conf) {
-        this.conf = conf;
+        this.mConf = conf;
     }
 
-    protected ChatConfiguration getConfiguration() {
-        return conf;
+    public ChatConfiguration getConfiguration() {
+        return mConf;
     }
 
-    protected void setTitle(String title) {
+    public void setOnMessageReceiveListener(OnMessageReceiveListener listener) {
+        mOnMessageReceiveListener = listener;
+    }
+
+    public OnMessageReceiveListener getOnMessageReceivedListener() {
+        return mOnMessageReceiveListener;
+    }
+
+    private void setTitle(String title) {
         getSupportActionBar().setTitle(title);
     }
 
@@ -121,8 +148,18 @@ public class ChatActivity extends AppCompatActivity {
             return this;
         }
 
+        public Builder setNotificationIcon(int icon) {
+            conf.setNotificationIcon(icon);
+            return this;
+        }
+
         public Builder setEditTextHint(String hint) {
             conf.setEditTextHint(hint);
+            return this;
+        }
+
+        public Builder setNotificationTitle(String title) {
+            conf.setNotificationTitle(title);
             return this;
         }
     }

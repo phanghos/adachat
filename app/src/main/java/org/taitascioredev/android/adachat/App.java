@@ -9,4 +9,5 @@ import android.app.Application;
 public class App extends Application {
 
     public static boolean isChatOpen = false;
+    public static ChatActivity context;
 }

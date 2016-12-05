@@ -16,18 +16,22 @@ public class ChatConfiguration implements Serializable {
     private int textColor;
     private int progressWheelColor;
     private int editTextLineColor;
+    private int notificationIcon;
     private String editTextHint;
+    private String notificationTitle;
 
     private Activity context;
 
     public ChatConfiguration(Activity context) {
-        senderBgColor      = R.color.colorPrimary;
-        receiverBgColor    = R.color.colorAccent;
-        textSize           = 16;
-        textColor          = android.R.color.white;
-        progressWheelColor = R.color.colorAccent;
-        editTextLineColor = R.color.colorAccent;
-        editTextHint = "";
+        senderBgColor       = R.color.colorPrimary;
+        receiverBgColor     = R.color.colorAccent;
+        textSize            = 16;
+        textColor           = android.R.color.white;
+        progressWheelColor  = R.color.colorAccent;
+        editTextLineColor   = R.color.colorAccent;
+        notificationIcon    = R.drawable.ic_chat_white_24dp;
+        editTextHint        = "";
+        notificationTitle   = "Te han enviado un mensaje";
     }
 
     public int getSenderBgColor() {
@@ -92,5 +96,21 @@ public class ChatConfiguration implements Serializable {
 
     public void setContext(Activity context) {
         this.context = context;
+    }
+
+    public String getNotificationTitle() {
+        return notificationTitle;
+    }
+
+    public void setNotificationTitle(String notificationTitle) {
+        this.notificationTitle = notificationTitle;
+    }
+
+    public int getNotificationIcon() {
+        return notificationIcon;
+    }
+
+    public void setNotificationIcon(int notificationIcon) {
+        this.notificationIcon = notificationIcon;
     }
 }
